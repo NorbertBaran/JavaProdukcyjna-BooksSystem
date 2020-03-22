@@ -5,10 +5,12 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @JsonSerialize
 public class Book {
-    private final String isbn;
-    private final String title;
-    private final String author;
-    private final Genre genre;
+    private String isbn;
+    private String title;
+    private String author;
+    private Genre genre;
+
+    public Book(){}
 
     public Book(String isbn, String title, String author, Genre genre) {
         if (isbn == null) throw new NullPointerException("ISBN cannot be null");

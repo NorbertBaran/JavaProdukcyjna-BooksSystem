@@ -1,12 +1,10 @@
 package pl.norbertbaran.books;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class BookService {
@@ -14,7 +12,8 @@ public class BookService {
 
     public BookService(){
         bookSet=new HashSet<>();
-        bookSet.add(new Book("123456", "The Lord of the Rings", "J.R.R. Tolkien", Genre.FICTION));
+        bookSet.add(new Book("101", "The Shawshank Redemption", " Frank Darabont", Genre.FICTION));
+        bookSet.add(new Book("102", "The Godfather", "Francis Ford Coppola", Genre.FICTION));
     }
 
     public boolean add(Book book) {
@@ -22,16 +21,20 @@ public class BookService {
     }
 
     public List<Book> getBooks() {
-        Set<Book> books=new HashSet<>();
-        books.addAll(bookSet);
+        Set<Book> books = new HashSet<>(bookSet);
         books.addAll(getBooksFromOutside());
         return new ArrayList<>(books);
     }
 
     public List<Book> getBooksFromOutside(){
-        RestTemplate restTemplate=new RestTemplate();
-        List<Book> outsideBooks=restTemplate.getForObject("https://jwzp-web-app-basic.herokuapp.com/books", ArrayList.class);
-        return outsideBooks;
+        Book[] books=null;
+        String url="https://jwzp-web-app-basic.herokuapp.com/books";
+        try {
+            books = new RestTemplate().getForEntity(url, Book[].class).getBody();
+        }catch (HttpClientErrorException e){
+            System.err.println("Getting books from "+url+". Error: "+e.getStatusCode());
+        }
+        return books==null ? List.of() : Arrays.asList(books);
     }
 
 }
