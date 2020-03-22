@@ -4,6 +4,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.*;
 
 @Service
@@ -17,22 +19,28 @@ public class BookService {
     }
 
     public boolean add(Book book) {
-        return bookSet.add(book);
+        Set<Book> books = new HashSet<>(bookSet);
+        books.addAll(getBooksFromOutside("https://jwzp-web-app-basic.herokuapp.com/books"));
+        books.addAll(getBooksFromOutside("PlaceForAdrianUrl"));
+        if(!books.contains(book))
+            return bookSet.add(book);
+        return false;
     }
 
     public List<Book> getBooks() {
         Set<Book> books = new HashSet<>(bookSet);
-        books.addAll(getBooksFromOutside());
+        books.addAll(getBooksFromOutside("https://jwzp-web-app-basic.herokuapp.com/books"));
         return new ArrayList<>(books);
     }
 
-    public List<Book> getBooksFromOutside(){
+    public List<Book> getBooksFromOutside(String url){
         Book[] books=null;
-        String url="https://jwzp-web-app-basic.herokuapp.com/books";
         try {
             books = new RestTemplate().getForEntity(url, Book[].class).getBody();
         }catch (HttpClientErrorException e){
-            System.err.println("Getting books from "+url+". Error: "+e.getStatusCode());
+            System.err.println("Getting books from \""+url+"\". Error: "+e.getStatusCode());
+        }catch(IllegalArgumentException e){
+            System.err.println("Getting books from \""+url+"\". Bad url.");
         }
         return books==null ? List.of() : Arrays.asList(books);
     }
