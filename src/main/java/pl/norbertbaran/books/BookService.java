@@ -21,7 +21,7 @@ public class BookService {
     public boolean add(Book book) {
         Set<Book> books = new HashSet<>(bookSet);
         books.addAll(getBooksFromOutside("https://jwzp-web-app-basic.herokuapp.com/books"));
-        books.addAll(getBooksFromOutside("PlaceForAdrianUrl"));
+        books.addAll(getBooksFromOutside("https://cascade-request.herokuapp.com/books"));
         if(!books.contains(book))
             return bookSet.add(book);
         return false;
@@ -30,6 +30,7 @@ public class BookService {
     public List<Book> getBooks() {
         Set<Book> books = new HashSet<>(bookSet);
         books.addAll(getBooksFromOutside("https://jwzp-web-app-basic.herokuapp.com/books"));
+        books.addAll(getBooksFromOutside("https://cascade-request.herokuapp.com/books"));
         return new ArrayList<>(books);
     }
 
